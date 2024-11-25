@@ -39,13 +39,13 @@ Also, train and adapt avg .pt files are [train pt file](./EEND-TBA/modelpt/train
 
     3. Visualization Result
         <figure class="half">  
-        <a href="link"><img src="./EEND-TBA/figure/EEND_VC_126_batch_img.png" align="center" width="49%"/></a>
-        <a href="link"><img src="./EEND-TBA/figure/EEND_TBA_126_batch_img.png" align="center" width="49%"/></a>  
+        <a href="link"><img src="./EEND-TBA/figure/EEND_VC_126_batch_img.png"  width="49%"/></a>
+        <a href="link"><img src="./EEND-TBA/figure/EEND_TBA_126_batch_img.png"  width="49%"/></a>  
         <figcaption> Sim3spk data (left: EEND-VC, right: EEND-TBA)</figcaption>
         </figure>
         <figure class="half">  
-        <a href="link"><img src="./EEND-TBA/figure/EEND_VC_74_batch_img.png" align="center" width="49%"/></a>
-        <a href="link"><img src="./EEND-TBA/figure/EEND_TBA_74_batch_img.png" align="center" width="49%"/></a>  
+        <a href="link"><img src="./EEND-TBA/figure/EEND_VC_74_batch_img.png"  width="49%"/></a>
+        <a href="link"><img src="./EEND-TBA/figure/EEND_TBA_74_batch_img.png"  width="49%"/></a>  
         <figcaption> Callhome data (left: EEND-VC, right: EEND-TBA)</figcaption>
         </figure>
 
