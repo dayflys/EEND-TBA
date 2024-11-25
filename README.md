@@ -3,7 +3,7 @@
 
 This repository provides the overall framework for training and evaluating End-to-End Neural Diarization framework with Token-based attractors proposed in **'EEND-TBA: End-To-End Neural Diarization Framework With Token-based Attractors'**
 
-<img src=./EEND-TBA/asset/overall9.JPG>
+<img src=./EEND-TBA/figure/overall9.JPG>
 
 
 
