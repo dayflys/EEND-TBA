@@ -3,7 +3,7 @@
 
 This repository provides the overall framework for training and evaluating End-to-End Neural Diarization framework with Token-based attractors proposed in **'EEND-TBA: End-To-End Neural Diarization Framework With Token-based Attractors'**
 
-<img src=./EEND-TBA/figure/overall9.JPG>
+<img src=./EEND-TBA/figure/overall_structure.JPG>
 
 
 
@@ -11,7 +11,7 @@ This repository provides the overall framework for training and evaluating End-t
 
 you can see this framework performance in [score file](./EEND-TBA/score/0.scores)
 
-also train and adapt avg .pt files are [train pt file](./EEND-TBA/modelpt/train/avg_trans.th) and [adapt pt file](./EEND-TBA/modelpt/adapt/avg_trans.th)
+Also, train and adapt avg .pt files are [train pt file](./EEND-TBA/modelpt/train/avg_trans.th) and [adapt pt file](./EEND-TBA/modelpt/adapt/avg_trans.th)
 
 * EEND-TBA
     * DataSet 
@@ -37,6 +37,8 @@ also train and adapt avg .pt files are [train pt file](./EEND-TBA/modelpt/train/
         |6 |0  |0 |0 |0 |**1** ||3 |1 |
         |7+|0  |0 |0 |1 |1 ||0 |2 |
 
+
+---
 
 ## Run experiment
 
@@ -74,27 +76,73 @@ Torchaudio
 
 
 
+---
+
 ### Data Prepare
 
 
-**데이터 세트 준비**
-- Kaldi를 이용하여 화자분할을 위한 Simulated Data를 생성
-  - [EEND repository](https://github.com/hitachi-speech/EEND)를 clone하여 Install tools 진행
-  - [EEND/egs/callhome/v1/run_prepare_shared_eda.sh](https://github.com/hitachi-speech/EEND/blob/master/egs/callhome/v1/run_prepare_shared_eda.sh) 파일을 실행하여 data 생성
-- [Preprocessing](https://github.com/Jungwoo4021/KT2023/tree/main/scripts/preprocessing_data/SpeakerDiarization)
-  - simulated data 를 log mel spectrogram로 변환하여 .pickle(EEND_EDA) 또는 .npy(EEND_VC,EEND-TBA) 파일로 저장
-  - 학습 코드에 preprocessing이 안되어있으면 진행하는 부분이 있기 때문에 별도로 진행하지 않아도 됨
+#### first, Preparing Simulated Data using kaldi 
+
+1. git clone [EEND repository](https://github.com/hitachi-speech/EEND) 
+2. Following EEND ropository, Install necessary tools
+3. Run [EEND/egs/callhome/v1/run_prepare_shared_eda.sh](https://github.com/hitachi-speech/EEND/blob/master/egs/callhome/v1/run_prepare_shared_eda.sh) file to make Simulated data
 
 
+
+#### Second, Data Preprocessing 
+
+- Convert the simulated data to log mel spectrogram format and save it as .npy file 
+
+- If the preprocessing step is not included in the training code, there might be a section to handle this automatically, so you do not need to perform it separately
+
+
+---
+
+### Additional logger
+
+We have a basic logger that stores information in local. However, if you would like to use an additional online logger (wandb or neptune):
+
+```In arguments.py
+# Wandb: Add 'wandb_user' and 'wandb_token'
+# Neptune: Add 'neptune_user' and 'neptune_token' 
+```
+
+#### for example
+
+```
+dictionary:
+'wandb_group'   : 'group',
+'wandb_entity'  : 'user-name',
+'wandb_api_key' : 'WANDB_TOKEN',
+'neptune_user'  : 'user-name',
+'neptune_token' : 'NEPTUNE_TOKEN'
+```
+
+
+#### logger
+```
+In main.py
+
+# Just remove "#" in logger
+builder = egg_exp.log.LoggerList.Builder(args['name'], args['project'], args['tags'], 	
+                                         args['description'], args['path_scripts'], args)
+builder.use_local_logger(args['path_log'])
+# builder.use_neptune_logger(args['neptune_user'], args['neptune_token'])
+# builder.use_wandb_logger(args['wandb_entity'], args['wandb_api_key'], 
+# 												 args['wandb_group'])
+logger = builder.build()
+logger.log_arguments(experiment_args)
+```
+
+
+
+---
 ### Multi-GPU training
 
 
 GPU indices could be set before training using the command export CUDA_VISIBLE_DEVICES=0,1,2,3.
 
 default value is CUDA_VISIBLE_DEVICES=0,1
-
-If you are running more than one distributed training session, you need to change the --port argument.
-
 
 ### Training
 1. Single GPU
@@ -110,6 +158,9 @@ python main.py --cuda_visible_devices=0,1
 1. Single GPU (only)
 
 
+---
+
+
 ### Folder Structure
 ```
 EEND-TBA
@@ -117,45 +168,46 @@ EEND-TBA
 ├── config				: Config files for experiments
 │   └── arguments.py	
 ├── Figures
-│   ├── EERs.pdf
-│   ├── 
-│   ├── 
-│   └── PartialSpoof_logo.png
-├── modelpt				: Config files for experiments
-│   ├── train			: convert string labels to numerical labels.
-│   │   └── label2num_2cls_0sil		: bonafide/spoof (More to be released)
-│   └── adapt			: convert string labels to numerical labels.
-│       └── label2num_2cls_0sil		: bonafide/spoof (More to be released)
-├── config				: Config files for experiments
-│   └── arguments.py
-├── src					: PartialSpoof Databases
-│   ├── data						: Folder for dev set
-│   │   ├── con_data	: related data file. (following kaldi format)
-│   │   ├── con_wav		: waveform
-│   │   ├── con_data	: related data file. (following kaldi format)
-│   │   ├── con_wav		: waveform
-│   │   └── dev.lst		: waveform list
-│   ├── infer						: Folder for dev set
-│   │   ├── con_data	: related data file. (following kaldi format)
-│   │   └── dev.lst		: waveform list
-│   ├── log						: Folder for dev set
-│   │   ├── con_data	: related data file. (following kaldi format)
-│   │   ├── con_wav		: waveform
-│   │   ├── con_data	: related data file. (following kaldi format)
-│   │   ├── con_wav		: waveform
-│   │   └── dev.lst		: waveform list
-│   ├── log						: Folder for dev set
-│   │   ├── con_data	: related data file. (following kaldi format)
-│   │   ├── con_wav		: waveform
-│   │   └── dev.lst		: waveform list
-│   └── vad
-│       ├── dev
-│       ├── eval
-│       ├── eval
-│       └── train
+│   ├── EEND_TBA_74_batch_img.png
+│   ├── EEND_VC_74_batch_img.png
+│   ├── EEND_TBA_126_batch_img.png
+│   ├── EEND_VC_126_batch_img.png    
+│   └── overall_structure.JPG       : overall structure of EEND-TBA 
+├── modelpt				            : averagy weights of best performance in each phase 
+│   ├── train			
+│   │   └── avg_trans.th
+│   └── adapt			
+│       └── avg_trans.th
+├── score				            : Score file of best performance 
+│   └── 0.scores
+├── src					
+│   ├── data						: Folder for data
+│   │   ├── datasets.py	            
+│   │   ├── features.py	            
+│   │   ├── kaldi.py	            
+│   │   ├── loader.py		        
+│   │   └── preprocess.py	        
+│   ├── infer						: Folder for inference 
+│   │   ├── infer_handler.py	            
+│   │   └── save_spkv.py		            
+│   ├── log						    : logger 
+│   │   ├── controller.py	            
+│   │   ├── interface.py		        
+│   │   ├── local.py	            
+│   │   ├── neptune.py		         
+│   │   └── wandb.py		         
+│   ├── models						: Folder for EEND-TBA model
+│   │   ├── eend_tba.py	            
+│   │   ├── transformer.py		    
+│   │   └── utils.py	            
+│   └── train
+│       ├── averagy.py
+│       ├── loss.py
+│       ├── scheduler.py
+│       └── train_handler.py
 ├── docker_build.sh
 ├── docker_run.sh
-├── Dockerfile
+├── Dockerfile          
 └── main.py
 ```
 

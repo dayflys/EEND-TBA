@@ -7,7 +7,7 @@ import numpy as np
 from config.arguments import get_args
 from src.log.controller import LogModuleController
 from src.data.loaders import DiarizationDataLoader
-from src.models.eend_vc import EEND_VC
+from src.models.eend_tba import EEND_TBA
 from src.models.utils import prepare_model_for_eval
 from src.train.scheduler import NoamScheduler
 from src.train.train_handler import TrainHandler
@@ -94,7 +94,7 @@ def train(process_id, args):
     diarization_loss = DiarizationLoss()
 
     # Prepare model
-    model = EEND_VC(args.num_speakers,
+    model = EEND_TBA(args.num_speakers,
         input_dim = input_dim,
         hidden_size = args.hidden_size,
         transformer_encoder_n_heads = args.transformer_encoder_n_heads,
@@ -160,7 +160,7 @@ def save_spkv_lab(args):
     diarization_loss = DiarizationLoss()
 
     # Prepare model
-    model = EEND_VC(
+    model = EEND_TBA(
         num_speakers=args.num_speakers,
         input_dim=input_dim,
         hidden_size=args.hidden_size,
@@ -193,7 +193,7 @@ def infer(args):
     input_dim = get_input_dim(args.frame_size,args.context_size,args.input_transform)
     
     
-    model = EEND_VC(args.num_speakers,
+    model = EEND_TBA(args.num_speakers,
         input_dim = input_dim,
         hidden_size = args.hidden_size,
         transformer_encoder_n_heads = args.transformer_encoder_n_heads,
@@ -219,63 +219,62 @@ def infer(args):
         infer_handler.speakercount_scoreing()
 
 
-def visual_sim(args):
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.cuda_visible_devices
-    input_dim = get_input_dim(args.frame_size,args.context_size,args.input_transform)
+# def visual_sim(args):
+#     os.environ['CUDA_VISIBLE_DEVICES'] = args.cuda_visible_devices
+#     input_dim = get_input_dim(args.frame_size,args.context_size,args.input_transform)
     
     
-    args.num_speakers = 3
-    args.preprocess_dir = 'data'
-    args.preprocess_trial = 'featlab_chunk_indices.txt'
-    args.batchsize = 1
-    args.num_workers = 4
-    loader = DiarizationDataLoader(args)
-    val_dataset = loader.get_dataset_from_feat(args.visual_sim_dir)
-    val_loader = loader.get_val_dataloader(val_dataset, None)    
-    iter_idx = 300
+#     args.num_speakers = 3
+#     args.preprocess_dir = 'data'
+#     args.preprocess_trial = 'featlab_chunk_indices.txt'
+#     args.batchsize = 1
+#     args.num_workers = 4
+#     loader = DiarizationDataLoader(args)
+#     val_dataset = loader.get_dataset_from_feat(args.visual_sim_dir)
+#     val_loader = loader.get_val_dataloader(val_dataset, None)    
+#     iter_idx = 300
 
-    model = EEND_VC(args.num_speakers,
-        input_dim = input_dim,
-        hidden_size = args.hidden_size,
-        transformer_encoder_n_heads = args.transformer_encoder_n_heads,
-        transformer_encoder_n_layers = args.transformer_encoder_n_layers,
-        transformer_encoder_dropout = 0,
-        shuffle=args.shuffle
-        )
-    model = prepare_model_for_eval(args.model_file, model)
-    infer_handler = InferHandler(args, model)
-    infer_handler.visual(val_loader,iter_idx,'sim')
+#     model = EEND_TBA(args.num_speakers,
+#         input_dim = input_dim,
+#         hidden_size = args.hidden_size,
+#         transformer_encoder_n_heads = args.transformer_encoder_n_heads,
+#         transformer_encoder_n_layers = args.transformer_encoder_n_layers,
+#         transformer_encoder_dropout = 0,
+#         shuffle=args.shuffle
+#         )
+#     model = prepare_model_for_eval(args.model_file, model)
+#     infer_handler = InferHandler(args, model)
+#     infer_handler.visual(val_loader,iter_idx,'sim')
 
-def visual_ch(args):
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.cuda_visible_devices
-    input_dim = get_input_dim(args.frame_size,args.context_size,args.input_transform)
-    model = EEND_VC(args.num_speakers,
-        input_dim = input_dim,
-        hidden_size = args.hidden_size,
-        transformer_encoder_n_heads = args.transformer_encoder_n_heads,
-        transformer_encoder_n_layers = args.transformer_encoder_n_layers,
-        transformer_encoder_dropout = 0,
-        shuffle=args.shuffle
-        )
-    model = prepare_model_for_eval(args.model_file, model)
-    args.num_speakers = 3
-    args.preprocess_dir = 'data'
-    args.preprocess_trial = 'featlab_chunk_indices.txt'
-    args.batchsize = 1
-    args.num_workers = 4
-    loader = DiarizationDataLoader(args)
-    val_dataset = loader.get_dataset_from_feat(args.visual_ch_dir)
-    val_loader = loader.get_val_dataloader(val_dataset, None)
-    iter_idx = 300
-    infer_handler = InferHandler(args, model)
-    infer_handler.visual(val_loader,iter_idx,'ch')
+# def visual_ch(args):
+#     os.environ['CUDA_VISIBLE_DEVICES'] = args.cuda_visible_devices
+#     input_dim = get_input_dim(args.frame_size,args.context_size,args.input_transform)
+#     model = EEND_TBA(args.num_speakers,
+#         input_dim = input_dim,
+#         hidden_size = args.hidden_size,
+#         transformer_encoder_n_heads = args.transformer_encoder_n_heads,
+#         transformer_encoder_n_layers = args.transformer_encoder_n_layers,
+#         transformer_encoder_dropout = 0,
+#         shuffle=args.shuffle
+#         )
+#     model = prepare_model_for_eval(args.model_file, model)
+#     args.num_speakers = 3
+#     args.preprocess_dir = 'data'
+#     args.preprocess_trial = 'featlab_chunk_indices.txt'
+#     args.batchsize = 1
+#     args.num_workers = 4
+#     loader = DiarizationDataLoader(args)
+#     val_dataset = loader.get_dataset_from_feat(args.visual_ch_dir)
+#     val_loader = loader.get_val_dataloader(val_dataset, None)
+#     iter_idx = 300
+#     infer_handler = InferHandler(args, model)
+#     infer_handler.visual(val_loader,iter_idx,'ch')
     
 
 if __name__ == '__main__':
     (train_args, save_spkv_lab_args, adapt_args, infer_args) = get_args()
     set_experiment_environment(train_args)
-    # start
-    '''
+    
     torch.multiprocessing.set_sharing_strategy('file_system')
     torch.multiprocessing.spawn(
         train, 
@@ -284,13 +283,11 @@ if __name__ == '__main__':
     )
     average(train_args)
     save_spkv_lab(save_spkv_lab_args)
-    '''
+    adapt(adapt_args)
     
-    # adapt(adapt_args)
+    average(adapt_args)
+    infer(infer_args)
     
-    # average(adapt_args)
-    # infer(infer_args)
-    visual_sim(infer_args)
-    visual_ch(infer_args)
-    #infer_handler = InferHandler(infer_args)
-    #infer_handler.scoring()
+    # visual_sim(infer_args)
+    # visual_ch(infer_args)
+    
