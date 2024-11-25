@@ -1,73 +1,32 @@
 # EEND-TBA
 
-This repository provides the overall framework for training and evaluating audio anti-spoofing systems proposed in 'AASIST: Audio Anti-Spoofing using Integrated Spectro-Temporal Graph Attention Networks'
 
-## Getting started
-requirements.txt must be installed for execution. We state our experiment environment for those who prefer to simulate as similar as possible.
+This repository provides the overall framework for training and evaluating End-to-End Neural Diarization framework with Token-based attractors proposed in **'EEND-TBA: End-To-End Neural Diarization Framework With Token-based Attractors'**
 
-Installing dependencies
-pip install -r requirements.txt
-Our environment (for GPU training)
-Based on a docker image: pytorch:1.6.0-cuda10.1-cudnn7-runtime
-GPU: 1 NVIDIA Tesla V100
-About 16GB is required to train AASIST using a batch size of 24
-gpu-driver: 418.67
-Data preparation
-We train/validate/evaluate AASIST using the ASVspoof 2019 logical access dataset [4].
-
-python ./download_dataset.py
-(Alternative) Manual preparation is available via
-
-ASVspoof2019 dataset: https://datashare.ed.ac.uk/handle/10283/3336
-Download LA.zip and unzip it
-Set your dataset directory in the configuration file
-Training
-The main.py includes train/validation/evaluation.
-
-To train AASIST [1]:
-
-python main.py --config ./config/AASIST.conf
-To train AASIST-L [1]:
-
-python main.py --config ./config/AASIST-L.conf
-Training baselines
-We additionally enabled the training of RawNet2[2] and RawGAT-ST[3].
-
-To Train RawNet2 [2]:
-
-python main.py --config ./config/RawNet2_baseline.conf
-To train RawGAT-ST [3]:
-
-python main.py --config ./config/RawGATST_baseline.conf
+<img src=./EEND-TBA/asset/overall9.JPG>
 
 
 
+## Result
 
+you can see this framework performance in [score file](./EEND-TBA/score/0.scores)
 
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-
-**Result**
+also train and adapt avg .pt files are [train pt file](./EEND-TBA/modelpt/train/avg_trans.th) and [adapt pt file](./EEND-TBA/modelpt/adapt/avg_trans.th)
 
 * EEND-TBA
-    * Test Data: CALLHOME Data 
-      1. DER (%)
+    * DataSet 
+
+        - train: 3spk Simulated Dataset
+        
+        - adapt : Callhome1 Dataset
+        
+        - test : Callhome2 Dataset
+
+    1. DER (%)
          * number of speakers: 2, 3, 4, 5, 6, ALL
          * DER: 6.68, 11.37, 14.68, 20.22, 28.03, 11.64
         
-      2. Speaker Counting (%)
+    2. Speaker Counting (%)
         
         |- |2  |3 |4 |5 |6 ||ref|pred|
         |--|-- |--|--|--|--|--|--|--|
@@ -78,12 +37,8 @@ python main.py --config ./config/RawGATST_baseline.conf
         |6 |0  |0 |0 |0 |**1** ||3 |1 |
         |7+|0  |0 |0 |1 |1 ||0 |2 |
 
-             
-    * 훈련 데이터 세트: Simulated Dataset (train) / Callhome1 Dataset (adapt)/ Callhome2 Dataset (test)
-    
 
-# Run experiment
-
+## Run experiment
 
 ### Set system arguments
 
@@ -91,6 +46,12 @@ First, you need to set system arguments. You can set arguments in `config/argume
 
 
 ### Experiment Setup
+
+Our environment (for GPU training)
+
+Based on a below docker image  
+
+GPU: 4 NVIDIA A5000
 
 <a href="https://github.com/Jungwoo4021/KT2023/blob/main/scripts/docker_files/Dockerfile24_09"><img src="https://img.shields.io/badge/DOCKER FILE-2496ED?style=for-the-badge&logo=Docker&logoColor=white"></a>
 
@@ -112,7 +73,8 @@ Torchaudio
 ```
 
 
-### Data
+
+### Data Prepare
 
 
 **데이터 세트 준비**
@@ -123,15 +85,6 @@ Torchaudio
   - simulated data 를 log mel spectrogram로 변환하여 .pickle(EEND_EDA) 또는 .npy(EEND_VC,EEND-TBA) 파일로 저장
   - 학습 코드에 preprocessing이 안되어있으면 진행하는 부분이 있기 때문에 별도로 진행하지 않아도 됨
 
-<!-- 
-The VoxCeleb datasets are used for these experiments.
-
-The train list should contain the identity and the file path, one line per utterance, as follows:
-
-```
-id00000 id00000/youtube_key/12345.wav
-id00012 id00012/21Uxsk56VDQ/00001.wav
-``` -->
 
 ### Multi-GPU training
 
@@ -156,54 +109,68 @@ python main.py --cuda_visible_devices=0,1
 ### Inference
 1. Single GPU (only)
 
+
+### Folder Structure
 ```
-PartialSpoof
-├── 01_download_database.sh			: Script used to download PartialSpoof from zenodo.
-├── 03multireso
-│   ├── 01_download_pretrained_models.sh	: Script used to download pretrained models.
-│   ├── main.py
-│   ├── model.py			: Model structure and loss are in here! same for multi/single-reso.
-│   ├── multi-reso		: folder for multi-reso model
-│   ├── README.md
-│   └── single-reso		: folder for single-reso model
-│       └── {2, 4, 8, 16, 32, 64, utt}
-├── config_ps				: Config files for experiments
-│   ├── config_test_on_dev.py
-│   └── config_test_on_eval.py
-├── env.sh						
+EEND-TBA
+│
+├── config				: Config files for experiments
+│   └── arguments.py	
 ├── Figures
 │   ├── EERs.pdf
+│   ├── 
+│   ├── 
 │   └── PartialSpoof_logo.png
-├── LICENSE
-├── metric			
-│   ├── cal_EER.sh
-│   ├── RangeEER.py
-│   ├── README.md
-│   ├── rttm_tool.py
-│   ├── SegmentEER.py
-│   └── UtteranceEER.py
-├── database					: PartialSpoof Databases
-│   ├── train
-│   ├── dev						: Folder for dev set
+├── modelpt				: Config files for experiments
+│   ├── train			: convert string labels to numerical labels.
+│   │   └── label2num_2cls_0sil		: bonafide/spoof (More to be released)
+│   └── adapt			: convert string labels to numerical labels.
+│       └── label2num_2cls_0sil		: bonafide/spoof (More to be released)
+├── config				: Config files for experiments
+│   └── arguments.py
+├── src					: PartialSpoof Databases
+│   ├── data						: Folder for dev set
+│   │   ├── con_data	: related data file. (following kaldi format)
+│   │   ├── con_wav		: waveform
 │   │   ├── con_data	: related data file. (following kaldi format)
 │   │   ├── con_wav		: waveform
 │   │   └── dev.lst		: waveform list
-│   ├── eval
-│   ├── label2num			: convert string labels to numerical labels.
-│   │   └── label2num_2cls_0sil		: bonafide/spoof (More to be released)
-│   ├── protocols
-│   ├── segment_labels
+│   ├── infer						: Folder for dev set
+│   │   ├── con_data	: related data file. (following kaldi format)
+│   │   └── dev.lst		: waveform list
+│   ├── log						: Folder for dev set
+│   │   ├── con_data	: related data file. (following kaldi format)
+│   │   ├── con_wav		: waveform
+│   │   ├── con_data	: related data file. (following kaldi format)
+│   │   ├── con_wav		: waveform
+│   │   └── dev.lst		: waveform list
+│   ├── log						: Folder for dev set
+│   │   ├── con_data	: related data file. (following kaldi format)
+│   │   ├── con_wav		: waveform
+│   │   └── dev.lst		: waveform list
 │   └── vad
 │       ├── dev
 │       ├── eval
+│       ├── eval
 │       └── train
-├── modules
-│   ├── gmlp.py
-│   ├── LICENSE
-│   ├── multi_scale
-│   │   └── post.py
-│   ├── s3prl  	     			: s3prl repo 
-│   └── ssl_pretrain 			: Folder to save downloaded pretrained ssl model
-├── project-NN-Pytorch-scripts.202102	: Modified project-NN-Pytorch-scripts repo
-└── README.md
+├── docker_build.sh
+├── docker_run.sh
+├── Dockerfile
+└── main.py
 ```
+
+
+
+
+
+<!-- Data preparation
+We train/validate/evaluate AASIST using the ASVspoof 2019 logical access dataset [4]. -->
+
+<!-- python ./download_dataset.py
+(Alternative) Manual preparation is available via
+
+ASVspoof2019 dataset: https://datashare.ed.ac.uk/handle/10283/3336
+Download LA.zip and unzip it
+Set your dataset directory in the configuration file
+Training
+The main.py includes train/validation/evaluation. -->
